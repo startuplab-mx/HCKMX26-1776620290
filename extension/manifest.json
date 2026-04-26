@@ -1,0 +1,38 @@
+{
+  "manifest_version": 3,
+  "name": "Guard · Pacto Digital",
+  "version": "0.1.0",
+  "description": "Detección on-device de patrones de grooming. Ningún mensaje sale del dispositivo.",
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Guard"
+  },
+  "permissions": [
+    "storage",
+    "offscreen"
+  ],
+  "host_permissions": [
+    "http://localhost:3000/*",
+    "https://*.supabase.co/*",
+    "https://web.whatsapp.com/*",
+    "https://discord.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://web.whatsapp.com/*"],
+      "js": ["content-whatsapp.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://discord.com/*"],
+      "js": ["content-discord.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
+  }
+}
