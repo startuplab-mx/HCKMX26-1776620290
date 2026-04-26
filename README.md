@@ -196,6 +196,30 @@ Documentamos explícitamente cada herramienta de IA empleada, en qué parte del 
 - **Para qué:** apoyo en la redacción de código, debugging, generación de SQL para migraciones, revisión de UI/UX y refactors. Curaduría humana de cada cambio antes de commit.
 - **En qué medida:** acelerador de productividad durante el hackatón. Ningún componente del producto en runtime invoca un LLM externo — toda la inferencia que ven los usuarios finales es nuestro propio modelo on-device.
 
+### 8. Servidores MCP (Model Context Protocol)
+
+Conectamos Claude Code a servicios externos mediante servidores MCP, que le permiten al asistente operar herramientas reales en lugar de solo sugerir comandos.
+
+- **MCP de Supabase** — usado para inspeccionar el esquema (`list_tables`, `list_extensions`), aplicar migraciones SQL (`apply_migration`), validar políticas RLS y consultar logs durante el desarrollo del backend. Aceleró la iteración sobre las 5 migraciones de [supabase/migrations/](supabase/migrations/) sin tener que cambiar de contexto al dashboard de Supabase.
+- **MCP de shadcn** — usado para descubrir, previsualizar e instalar componentes del registro de shadcn/ui (`search_items_in_registries`, `view_items_in_registries`, `get_add_command_for_items`). Sirvió para ensamblar rápidamente la UI del dashboard tutor/menor y los formularios del Pacto Digital con componentes accesibles ya validados.
+- **En qué medida:** herramientas de desarrollo, no de runtime. Ningún MCP queda colgado del producto final ni se invoca desde la app desplegada en Vercel.
+
+### 9. Skills locales del agente ([.agents/skills/](.agents/skills/))
+
+El repositorio incluye un conjunto de *skills* (instrucciones especializadas) que Claude Code carga automáticamente cuando detecta que la tarea coincide con su dominio. Sirven como guardarraíles para que las sugerencias del asistente respeten las convenciones del stack en lugar de inventar APIs antiguas o anti-patrones.
+
+| Skill | Para qué se aplicó |
+|---|---|
+| `next-best-practices`, `next-cache-components`, `next-upgrade` | Server actions, route handlers, RSC boundaries y migración a Next.js 16 (App Router). |
+| `react-best-practices`, `composition-patterns` | Patrones de componentes en React 19 (sin `forwardRef`, compound components, lift state). |
+| `tailwind-css-patterns`, `frontend-design` | Estilos del dashboard, layout responsivo y componentes accesibles. |
+| `accessibility` | Cumplimiento de WCAG en formularios de registro, firma del Pacto y botón SOS. |
+| `supabase-postgres-best-practices` | Diseño de RLS, índices y constraints en las 5 migraciones de Supabase. |
+| `typescript-advanced-types`, `nodejs-best-practices`, `nodejs-backend-patterns` | Tipado estricto del API `/api/signals` y de las server actions. |
+| `seo` | Metadatos de la landing pública. |
+
+- **En qué medida:** son únicamente directrices para el asistente durante el desarrollo. No se ejecutan en runtime y no contienen lógica de negocio del producto.
+
 ### Lo que **no** hacemos con IA
 
 - No mandamos contenido de mensajes a ningún LLM externo (OpenAI, Anthropic, Google, etc.).
