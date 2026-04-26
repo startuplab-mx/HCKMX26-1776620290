@@ -1,4 +1,4 @@
-# Guard — Pacto Digital
+# GuardIA — Pacto Digital
 
 Capa de protección digital para menores: detección on-device de patrones de grooming + dashboard familiar transparente basado en un Pacto Digital firmado entre tutor y menor.
 
